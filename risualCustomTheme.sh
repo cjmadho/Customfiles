@@ -62,7 +62,6 @@ log "Adding and compiling risual theme"
 sudo mv /edx/app/edxapp/themes /edx/app/edxapp/themes.old
 
 
-
 log "Cloning risual Repo for risual theme"
 
 
@@ -81,7 +80,7 @@ sudo chown -R edxapp:edxapp /edx/app/edxapp/themes
 
 sudo chmod -R u+rw /edx/app/edxapp/themes
 
-
+log "Compile the themes"
 
 sudo -H -u edxapp bash
 
@@ -97,7 +96,7 @@ cd /edx/app/edxapp/edx-platform
 
 paver update_assets lms --settings=aws
 
-
+exit
 
 log "Restart website"
 
