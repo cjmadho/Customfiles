@@ -17,7 +17,6 @@ log()
     
 
     # $1 - the message to log
-
     # $2 - flag for error message = 1 (only presence test)
 
     
@@ -50,7 +49,7 @@ log()
 
     # send the message to syslog
 
-    logger $1 >> /var/log/risualThemeLog
+    logger $1 >> /var/log/risualThemeLog.log
 
 
 }
