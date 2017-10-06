@@ -1,0 +1,6 @@
+mongo:10.0.0.11:mongo1:
+mongo:10.0.0.12:mongo2:
+mongo:10.0.0.13:mongo3:
+mysql:10.0.0.16:mysql1:master
+mysql:10.0.0.17:mysql2:slave
+mysql:10.0.0.18:mysql3:slave
