@@ -2,7 +2,7 @@
 # =============================================================================
 # Name: risual_fix.sh
 # Purpose: Perfrom fixes for deployed OpenEdX environment
-# Author:  David Brass (risual)
+# Author:  David Brass (risual) Modified: Daniel Cubley (risual)
 # Release: 1.0 08/09/2017
 #          1.1 05/10/2017 (amended ssh connections to avoid using known hosts)
 #                         (amended mongodb pid location)
@@ -11,6 +11,7 @@
 #                         (added powerbi_ro account for MySQL)
 #          1.2 15/12/2017 (Amended oxa-tools2 to oxa-tools5)
 #			  (Added script to update mongodb.service to add type=forking)
+#			  (Added script to ammend rc.local to create /var/run/mongodb folder)
 # =============================================================================
 
 # =============================================================================
@@ -107,6 +108,18 @@ do
 	SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
 	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '7iType=forking' /lib/systemd/system/mongodb.service"
 	echo "    updating /lib/systemd/system/mongodb.service on $SERVER_NAME"
+done
+
+echo ""
+echo "  Amending /etc/rc.local to create mongodb folder on startup"
+echo ""
+
+for SERVER in $ALL_MONGO_SERVERS
+do
+	SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '21isudo mkdir -p /var/run/mongodb' /etc/rc.local"
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '22isudo chown mongodb:mongodb /var/run/mongodb' /etc/rc.local"
+	echo "    updating /etc/rc.local on $SERVER_NAME"
 done
 }
 
