@@ -9,6 +9,8 @@
 #                         (changed backup script to use new location)
 #                         (corrected path for mongo script in crontab)
 #                         (added powerbi_ro account for MySQL)
+#          1.2 15/12/2017 (Amended oxa-tools2 to oxa-tools5)
+#			  (Added script to update mongodb.service to add type=forking)
 # =============================================================================
 
 # =============================================================================
@@ -18,7 +20,7 @@
 PARAMETER_FILE=/home/risual-admin/db_servers
 HOSTNAME=`hostname`
 CRON_MYSQL_LOG_PURGE="0 17 * * * sudo /home/risual-admin/mysql_maintenance.sh > /home/risual-admin/mysql_maintenance.log 2>&1"
-CRON_MONGO_BACKUP="0 16 * * * sudo bash /oxa/oxa-tools2/scripts/db_backup.sh.mongo"
+CRON_MONGO_BACKUP="0 16 * * * sudo bash /oxa/oxa-tools5/scripts/db_backup.sh.mongo"
 ALL_MYSQL_SERVERS=`cat $PARAMETER_FILE|grep mysql|cut -f2 -d: -s`
 ALL_MONGO_SERVERS=`cat $PARAMETER_FILE|grep mongo|cut -f2 -d: -s`
 NOW=`date`
@@ -94,6 +96,17 @@ do
         SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i 's#/var/run/mongodb/mongod.pid#/datadisks/disk1/mongodb/db/mongod.pid#g' /etc/mongod.conf"
         echo "    updating /etc/mongod.conf on $SERVER_NAME"
+done
+
+echo ""
+echo "  Amending mongodb.service to add Type=forking"
+echo ""
+
+for SERVER in $ALL_MONGO_SERVERS
+do
+	SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '7iType=forking' /lib/systemd/system/mongodb.service"
+	echo "    updating /lib/systemd/system/mongodb.service on $SERVER_NAME"
 done
 }
 
