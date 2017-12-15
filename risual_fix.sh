@@ -194,8 +194,7 @@ EOF
         endscript
 }
 EOF
-done
-}
+done}
 
 mysql_data_location() {
 echo ""
@@ -236,25 +235,25 @@ echo ""
 echo "  Amending MySQL Backup script to use shared backup storage account"
 echo ""
 
-cp /oxa/oxa-tools2/scripts/backup_configuration_mysql.sh /oxa/oxa-tools2/scripts/backup_configuration_mysql.sh.orig
-sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools2/scripts/backup_configuration_mysql.sh
-sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools2/scripts/backup_configuration_mysql.sh
+cp /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh.orig
+sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
+sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
 
 echo ""
 echo "  Amending Mongo Backup script to use shared backup storage account"
 echo ""
 
-cp /oxa/oxa-tools2/scripts/backup_configuration_mongo.sh /oxa/oxa-tools2/scripts/backup_configuration_mongo.sh.orig
-sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools2/scripts/backup_configuration_mongo.sh
-sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools2/scripts/backup_configuration_mongo.sh
+cp /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh.orig
+sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
+sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
 
 echo ""
 echo "  Amending core backup script to use modified container name"
 echo ""
 
-cp /oxa/oxa-tools2/scripts/db_backup.sh /oxa/oxa-tools2/scripts/db_backup.sh.orig
-sed -i '36s/.*/    CONTAINER_NAME=`echo "${HOSTNAME,,}" | rev | cut -c3- | rev`/' /oxa/oxa-tools2/scripts/db_backup.sh
-sed -i '116s/.*/    CONTAINER_NAME="$CONTAINER_NAME-${DATABASE_TYPE}-backup"/' /oxa/oxa-tools2/scripts/db_backup.sh
+cp /oxa/oxa-tools5/scripts/db_backup.sh /oxa/oxa-tools5/scripts/db_backup.sh.orig
+sed -i '36s/.*/    CONTAINER_NAME=`echo "${HOSTNAME,,}" | rev | cut -c3- | rev`/' /oxa/oxa-tools5/scripts/db_backup.sh
+sed -i '116s/.*/    CONTAINER_NAME="$CONTAINER_NAME-${DATABASE_TYPE}-backup"/' /oxa/oxa-tools5/scripts/db_backup.sh
 }
 
 powerbi_ro_user () {
