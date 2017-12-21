@@ -10,8 +10,9 @@
 #                         (corrected path for mongo script in crontab)
 #                         (added powerbi_ro account for MySQL)
 #          1.2 15/12/2017 (Amended oxa-tools2 to oxa-tools5)
-#			  (Added script to update mongodb.service to add type=forking)
-#			  (Added script to ammend rc.local to create /var/run/mongodb folder)
+#          1.3 21/12/2017 (copy custom files into the correct directory following deployment)
+#                         (amended oxatools5 backup script for container name)
+#                         (amended AZURE_CONNECTION_STRING in both backup configuration files)
 # =============================================================================
 
 # =============================================================================
@@ -56,6 +57,11 @@ date > $STATUS_FILE
 # Functions
 # =============================================================================
 
+copy_files() {
+cp -r /etc/risualCustom/. /home/risual-admin/
+chmod +x /home/risual-admin/*.sh
+}
+
 local_crontab() {
 echo ""
 echo "  Amending crontab entries for database backups"
@@ -97,29 +103,6 @@ do
         SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i 's#/var/run/mongodb/mongod.pid#/datadisks/disk1/mongodb/db/mongod.pid#g' /etc/mongod.conf"
         echo "    updating /etc/mongod.conf on $SERVER_NAME"
-done
-
-echo ""
-echo "  Amending mongodb.service to add Type=forking"
-echo ""
-
-for SERVER in $ALL_MONGO_SERVERS
-do
-	SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '7iType=forking' /lib/systemd/system/mongodb.service"
-	echo "    updating /lib/systemd/system/mongodb.service on $SERVER_NAME"
-done
-
-echo ""
-echo "  Amending /etc/rc.local to create mongodb folder on startup"
-echo ""
-
-for SERVER in $ALL_MONGO_SERVERS
-do
-	SERVER_NAME=`grep $SERVER $PARAMETER_FILE|cut -f3 -d: -s`
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '21isudo mkdir -p /var/run/mongodb' /etc/rc.local"
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER "sudo sed -i '22isudo chown mongodb:mongodb /var/run/mongodb' /etc/rc.local"
-	echo "    updating /etc/rc.local on $SERVER_NAME"
 done
 }
 
@@ -238,6 +221,7 @@ echo ""
 cp /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh.orig
 sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
 sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
+sed -i '15s/.*/AZURE_STORAGEACCOUNT_CONNECTIONSTRING="DefaultEndpointsProtocol=https;AccountName=risedulrnbackups;AccountKey=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==;EndpointSuffix=core.windows.net"' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
 
 echo ""
 echo "  Amending Mongo Backup script to use shared backup storage account"
@@ -246,14 +230,15 @@ echo ""
 cp /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh.orig
 sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
 sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
+sed -i '15s/.*/AZURE_STORAGEACCOUNT_CONNECTIONSTRING="DefaultEndpointsProtocol=https;AccountName=risedulrnbackups;AccountKey=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==;EndpointSuffix=core.windows.net"' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
 
 echo ""
 echo "  Amending core backup script to use modified container name"
 echo ""
 
 cp /oxa/oxa-tools5/scripts/db_backup.sh /oxa/oxa-tools5/scripts/db_backup.sh.orig
-sed -i '36s/.*/    CONTAINER_NAME=`echo "${HOSTNAME,,}" | rev | cut -c3- | rev`/' /oxa/oxa-tools5/scripts/db_backup.sh
-sed -i '116s/.*/    CONTAINER_NAME="$CONTAINER_NAME-${DATABASE_TYPE}-backup"/' /oxa/oxa-tools5/scripts/db_backup.sh
+sed -i '137s/.*/    CONTAINER_NAME=`echo "${HOSTNAME,,}" | rev | cut -c3- | rev`/' /oxa/oxa-tools5/scripts/db_backup.sh
+sed -i '138s/.*/    CONTAINER_NAME="$CONTAINER_NAME-${DATABASE_TYPE}-backup"/' /oxa/oxa-tools5/scripts/db_backup.sh
 }
 
 powerbi_ro_user () {
@@ -272,9 +257,11 @@ EOF
 # Call block
 # =============================================================================
 
-echo ""
+echo "  ==========================================================================="
 echo "  risual fix script executing on $HOSTNAME on $NOW"
 echo "  ==========================================================================="
+
+copy_files
 local_crontab
 mongo_parameters
 mongo_logrotate
