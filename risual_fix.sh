@@ -19,7 +19,7 @@
 # Variables
 # =============================================================================
 
-PARAMETER_FILE=/home/risual-admin/db_servers
+PARAMETER_FILE=/etc/risualCustom/db_servers
 HOSTNAME=`hostname`
 CRON_MYSQL_LOG_PURGE="0 17 * * * sudo /home/risual-admin/mysql_maintenance.sh > /home/risual-admin/mysql_maintenance.log 2>&1"
 CRON_MONGO_BACKUP="0 16 * * * sudo bash /oxa/oxa-tools5/scripts/db_backup.sh.mongo"
@@ -120,7 +120,8 @@ do
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q risual-admin@$SERVER sudo dd of=/etc/logrotate.d/mongodb << EOF
 /mongo/log/*.log {
     daily
-    rotate 7
+
+rotate 7
     compress
     dateext
     missingok
@@ -221,7 +222,7 @@ echo ""
 cp /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh.orig
 sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
 sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
-sed -i '15s/.*/AZURE_STORAGEACCOUNT_CONNECTIONSTRING="DefaultEndpointsProtocol=https;AccountName=risedulrnbackups;AccountKey=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==;EndpointSuffix=core.windows.net"' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
+sed -i '15s/.*/AZURE_STORAGEACCOUNT_CONNECTIONSTRING=DefaultEndpointsProtocol=https;AccountName=risedulrnbackups;AccountKey=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==;EndpointSuffix=core.windows.net' /oxa/oxa-tools5/scripts/backup_configuration_mysql.sh
 
 echo ""
 echo "  Amending Mongo Backup script to use shared backup storage account"
@@ -230,7 +231,7 @@ echo ""
 cp /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh.orig
 sed -i '1s/.*/BACKUP_STORAGEACCOUNT_NAME=risedulrnbackups/' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
 sed -i '2s/.*/BACKUP_STORAGEACCOUNT_KEY=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==/' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
-sed -i '15s/.*/AZURE_STORAGEACCOUNT_CONNECTIONSTRING="DefaultEndpointsProtocol=https;AccountName=risedulrnbackups;AccountKey=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==;EndpointSuffix=core.windows.net"' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
+sed -i '15s/.*/AZURE_STORAGEACCOUNT_CONNECTIONSTRING=DefaultEndpointsProtocol=https;AccountName=risedulrnbackups;AccountKey=Ucy7jysAPEj2vWU72YtPAWM67UnMvlVjzUmdETurGcMF+N7Lr38PB0LCYgeC9WvRm5qz+ptmXEXvzwXBdfN7vQ==;EndpointSuffix=core.windows.net' /oxa/oxa-tools5/scripts/backup_configuration_mongo.sh
 
 echo ""
 echo "  Amending core backup script to use modified container name"
