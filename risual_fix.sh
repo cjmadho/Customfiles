@@ -150,6 +150,7 @@ done
 
 mysql_logrotate() {
 echo ""
+
 echo "  Setting up logrotate for the MySQL database server log files"
 echo ""
 
@@ -178,7 +179,8 @@ EOF
         endscript
 }
 EOF
-done}
+done
+}
 
 mysql_data_location() {
 echo ""
